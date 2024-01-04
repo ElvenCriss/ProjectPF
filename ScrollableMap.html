@@ -16,7 +16,6 @@
 
 <body>
   <div id="myDiagramDiv"></div>
-
   <script>
     // Your GoJS diagram code here
     var $ = go.GraphObject.make;
@@ -25,18 +24,19 @@
       // Define the grid properties
       
       nodeTemplate: makeNodeTemplate(), // Set the node template
-      grid: $(go.Panel, "Grid",
-        { gridCellSize: new go.Size(30, 30), background: "gray25" }, // Set the background color of the grid
-        $(go.Shape, "LineH", { stroke: "lightgray", strokeWidth: 0.5 }),
-        $(go.Shape, "LineV", { stroke: "lightgray", strokeWidth: 0.5 })
-      ),
-      // Enable scrolling
-      "scrollMode": go.Diagram.InfiniteScroll,
-      'undoManager.isEnabled': true,
 
-      // Other diagram properties
-      // ...
+      
     });
+    
+    myDiagram.add(
+      $(go.Part,  // this Part is not bound to any model data
+        {
+          width: 1920, height: 1080,
+          layerName: "Background", position: new go.Point(0, 0),
+          selectable: false, pickable: false
+        },
+        $(go.Picture, "\TestFloorPlan.jpg")
+      ));
 
 
 
@@ -64,12 +64,13 @@ function saveDiagramChanges() {
     return $(
         go.Node,
         'Auto',
-        $(go.Shape, 'RoundedRectangle', { fill: 'gray25', stroke: 'Cyan' }),
+        $(go.Shape, 'RoundedRectangle', { fill: 'transparent', stroke: 'Cyan' }),
         $(go.TextBlock, {
             margin: 8,
-            stroke: 'White',
+           stroke: 'Grey',
             font: 'bold 12px sans-serif',
-            background: 'gray25'
+            background: 'transparent'
+            
         },
         new go.Binding('text', 'text'))
     );
@@ -107,8 +108,8 @@ function fetchDiagramChanges() {
 
 
   // Listen for diagram changes and save to localStorage
-  myDiagram.addDiagramListener("ChangedSelection", saveDiagramChanges);
-  myDiagram.addDiagramListener("ClipboardChanged", saveDiagramChanges);
+  //myDiagram.addDiagramListener("ChangedSelection", saveDiagramChanges);
+  //myDiagram.addDiagramListener("ClipboardChanged", saveDiagramChanges);
   // You can add more listeners based on events you want to save the diagram for
   
 
