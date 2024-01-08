@@ -1,0 +1,15 @@
+npm install -g nodemon
+
+python -m http.server 
+
+cd Users\vnwng\source\repos\ProjectPF
+py -m http.server
+
+
+Continue explore Python Server code.
+
+Try look for GoJs example that used 
+
+
+to make it Offline available:
+https://cdnjs.com/libraries/gojs

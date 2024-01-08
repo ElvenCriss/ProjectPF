@@ -1,142 +1,43 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <title>GoJS Gridded Scrollable Diagram</title>
+  <title>GoJS Diagram</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/2.1.53/go.js"></script>
-  <style>
-    /* Ensure the diagram takes up the entire page */
-    #myDiagramDiv {
-      width: 100%;
-      height: 100vh;
-      border: 1px solid black;
-    }
-  </style>
 </head>
-
 <body>
-  <div id="myDiagramDiv"></div>
+  <div id="myDiagramDiv" style="width:100%; height:600px; border: solid 1px black;"></div>
+
   <script>
-    // Your GoJS diagram code here
     var $ = go.GraphObject.make;
-
-    var myDiagram  = $(go.Diagram, "myDiagramDiv", {
-      // Define the grid properties
-      
-      nodeTemplate: makeNodeTemplate(), // Set the node template
-
-      
+    var myDiagram = $(go.Diagram, "myDiagramDiv", {
+      // diagram setup
     });
-    
-    myDiagram.add(
-      $(go.Part,  // this Part is not bound to any model data
-        {
-          width: 1920, height: 1080,
-          layerName: "Background", position: new go.Point(0, 0),
-          selectable: false, pickable: false
-        },
-        $(go.Picture, "\TestFloorPlan.jpg")
-      ));
 
+    // Load the JSON file into the diagram
+    fetch('diagramData.json')
+      .then(response => response.json())
+      .then(data => {
+        // Load data into the diagram
+        myDiagram.model = go.Model.fromJson(data);
+      })
+      .catch(error => console.error('Error loading JSON:', error));
 
-
-// Save Diagram Changes
-function saveDiagramChanges() {
-    var serializedDiagram = diagram.model.toJson();
-  
-    fetch('/fetchDiagram.json', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ diagramData: serializedDiagram }),
-    })
-    .then(response => {
-      // Handle success or error
-      console.log('Diagram changes saved successfully');
-    })
-    .catch(error => {
-      console.error('Error saving diagram changes:', error);
+    // Update the JSON file when the diagram changes
+    myDiagram.addDiagramListener('ChangedSelection', function() {
+      var jsonData = myDiagram.model.toJson();
+      fetch('/update-diagram', {
+        method: 'POST',
+        body: JSON.stringify(jsonData)
+      })
+      .then(response => {
+        if (response.ok) {
+          console.log('Diagram updated successfully');
+        } else {
+          console.error('Failed to update diagram');
+        }
+      })
+      .catch(error => console.error('Error updating diagram:', error));
     });
-  }
-
-  function makeNodeTemplate() {
-    return $(
-        go.Node,
-        'Auto',
-        $(go.Shape, 'RoundedRectangle', { fill: 'transparent', stroke: 'Cyan' }),
-        $(go.TextBlock, {
-            margin: 8,
-           stroke: 'Grey',
-            font: 'bold 12px sans-serif',
-            background: 'transparent'
-            
-        },
-        new go.Binding('text', 'text'))
-    );
-}
-// Fetch Saved Diagram Changes
-function fetchDiagramChanges() {
-    fetch('/fetchDiagram.json')
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      // Load retrieved data back into the diagram'
-      showInfo(data);
-      myDiagram.model = go.Model.fromJson(data);
-      console.log('Diagram changes fetched successfully');
-      
-    })
-    .catch(error => {
-      console.error('Error fetching diagram changes:', error);
-    });
-  }
-    
-  // Load the diagram from localStorage when the page loads
-  fetchDiagramChanges();
-  
-  function showInfo(data)
-{
-    const jsonstring = JSON.stringify(data);
-    console.log(jsonstring);
-}
-
-
-
-  // Listen for diagram changes and save to localStorage
-  //myDiagram.addDiagramListener("ChangedSelection", saveDiagramChanges);
-  //myDiagram.addDiagramListener("ClipboardChanged", saveDiagramChanges);
-  // You can add more listeners based on events you want to save the diagram for
-  
-
-
-
-/*
-    // Add nodes or elements to the diagram
-    diagram.nodeTemplate =
-      $(go.Node, "Auto",
-        $(go.Shape, "RoundedRectangle", { fill: "lightblue" }),
-        $(go.TextBlock, { margin: 8 }, new go.Binding("text", "key"))
-      );
-
-    // Add some sample data
-    var nodeData = [
-      { key: "Node 1" },
-      { key: "Node 2" },
-      // Add more nodes as needed
-    ];
-
-    // Set the model for the diagram
-    diagram.model = new go.GraphLinksModel(nodeData, []);
-
-*/
-
-
   </script>
 </body>
-
 </html>
