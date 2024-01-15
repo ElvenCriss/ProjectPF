@@ -1,35 +1,41 @@
 const express = require('express');
-const fs = require('fs');
+const fs = require('fs').promises;
+const path = require('path');
+const bodyParser = require('body-parser');
 
 const app = express();
-app.use(express.json());
+const port = 3000;
 
-const jsonFilePath = 'diagramData.json';
+app.use(express.static('public'));
+app.use(bodyParser.json());
 
-// GET request to retrieve the JSON data
-app.get('/get-diagram', (req, res) => {
-  fs.readFile(jsonFilePath, 'utf8', (err, data) => {
-    if (err) {
-      res.status(500).send('Error reading JSON file');
-      return;
-    }
-    res.json(JSON.parse(data));
-  });
+const diagramFilePath = path.join(__dirname, 'diagramData.json');
+
+// Handle GET request to retrieve diagram data
+app.get('/getDiagramData', async (req, res) => {
+  console.log("GetEvent Triggered")
+  try {
+    const diagramData = await fs.readFile(diagramFilePath, 'utf8');
+    res.json(JSON.parse(diagramData));
+  } catch (error) {
+    console.error('Error reading diagram data:', error);
+    res.status(500).json({ error: 'Error reading diagram data' });
+  }
 });
 
-// POST request to update the JSON file
-app.post('/update-diagram', (req, res) => {
-  const jsonData = req.body;
-  fs.writeFile(jsonFilePath, JSON.stringify(jsonData, null, 2), 'utf8', (err) => {
-    if (err) {
-      res.status(500).send('Error updating JSON file');
-      return;
-    }
-    res.send('Diagram updated successfully');
-  });
+// Handle POST request to update diagram data
+app.post('/updateDiagramData', async (req, res) => {
+  console.log("update Diagram Event Triggered")
+  const { body } = req;
+  try {
+    await fs.writeFile(diagramFilePath, JSON.stringify(body), 'utf8');
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error updating diagram data:', error);
+    res.status(500).json({ error: 'Error updating diagram data' });
+  }
 });
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
 });

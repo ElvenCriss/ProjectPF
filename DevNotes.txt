@@ -13,3 +13,5 @@ Try look for GoJs example that used
 
 to make it Offline available:
 https://cdnjs.com/libraries/gojs
+
+https://www.youtube.com/watch?v=fyc-4YmgLu0
