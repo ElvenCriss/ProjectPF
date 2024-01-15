@@ -11,6 +11,7 @@ app.use(bodyParser.json());
 
 const diagramFilePath = path.join(__dirname, 'diagramData.json');
 
+console.log(diagramFilePath)
 // Handle GET request to retrieve diagram data
 app.get('/getDiagramData', async (req, res) => {
   console.log("GetEvent Triggered")
